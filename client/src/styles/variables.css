@@ -1,0 +1,109 @@
+/* CSS Variables and Theme Design Tokens */
+
+:root {
+  /* Fonts */
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Common/Shared Tokens */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 16px -6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Indian Emergency Theme Colors - Default Light */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-on-accent: #ffffff;
+
+  --border-color: #e2e8f0;
+  --border-glass: rgba(255, 255, 255, 0.4);
+
+  --accent: #d97706; /* Saffron Orange */
+  --accent-hover: #b45309;
+  --accent-light: #fef3c7;
+  
+  --danger: #dc2626; /* Rescue Red */
+  --danger-hover: #b91c1c;
+  --danger-light: #fee2e2;
+
+  --success: #16a34a; /* Green */
+  --success-hover: #15803d;
+  --success-light: #dcfce7;
+
+  /* Professional Triage Colors */
+  --triage-black: #18181b;       /* Deceased */
+  --triage-black-text: #f4f4f5;
+  --triage-red: #ef4444;         /* Immediate (Critical) */
+  --triage-red-text: #ffffff;
+  --triage-yellow: #f59e0b;      /* Delayed (Serious) */
+  --triage-yellow-text: #1e1b4b;
+  --triage-green: #10b981;       /* Minimal (Minor) */
+  --triage-green-text: #ffffff;
+
+  /* Road Blockage Status Colors */
+  --blockage-total: #7f1d1d;
+  --blockage-total-bg: #fee2e2;
+  --blockage-partial: #b45309;
+  --blockage-partial-bg: #fef3c7;
+  --blockage-none: #14532d;
+  --blockage-none-bg: #dcfce7;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme Tokens */
+  --bg-primary: #090d16;
+  --bg-secondary: #111827;
+  --bg-card: #151f32;
+  --bg-glass: rgba(21, 31, 50, 0.75);
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-on-accent: #0f172a;
+
+  --border-color: #1e293b;
+  --border-glass: rgba(21, 31, 50, 0.4);
+
+  --accent: #fb923c; /* Glowing Saffron */
+  --accent-hover: #f97316;
+  --accent-light: rgba(251, 146, 60, 0.1);
+  
+  --danger: #f87171; /* Glowing Crimson */
+  --danger-hover: #ef4444;
+  --danger-light: rgba(248, 113, 113, 0.1);
+
+  --success: #4ade80; /* Glowing Green */
+  --success-hover: #22c55e;
+  --success-light: rgba(74, 222, 128, 0.1);
+
+  --triage-black: #09090b;
+  --triage-black-text: #e4e4e7;
+  --triage-red: #f87171;
+  --triage-red-text: #09090b;
+  --triage-yellow: #fbbf24;
+  --triage-yellow-text: #09090b;
+  --triage-green: #34d399;
+  --triage-green-text: #09090b;
+
+  --blockage-total: #f87171;
+  --blockage-total-bg: rgba(248, 113, 113, 0.15);
+  --blockage-partial: #fbbf24;
+  --blockage-partial-bg: rgba(251, 191, 36, 0.15);
+  --blockage-none: #34d399;
+  --blockage-none-bg: rgba(52, 211, 153, 0.15);
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 16px -6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+}
