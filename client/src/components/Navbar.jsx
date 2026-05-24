@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, AlertTriangle, Map, Image, Radio, ShieldAlert } from 'lucide-react';
+import { Sun, Moon, Map, Image, Radio, ShieldAlert, Download } from 'lucide-react';
+import InstallModal from './InstallModal';
 
 const Navbar = ({ activeTab, setActiveTab }) => {
   const { theme, toggleTheme } = useTheme();
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(true); // Always show the button
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard Map', shortLabel: 'Map', icon: Map },
@@ -11,6 +15,22 @@ const Navbar = ({ activeTab, setActiveTab }) => {
     { id: 'collision', label: 'Collision Detector', shortLabel: 'Telemetry', icon: Radio },
     { id: 'emergency', label: 'Emergency Hub', shortLabel: 'Emergency', icon: ShieldAlert },
   ];
+
+  // Capture the native browser install prompt for Android/Desktop Chrome
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+
+    // Hide button if app is already installed (standalone mode)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setShowInstallBtn(false);
+    }
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
 
   return (
     <>
@@ -40,6 +60,19 @@ const Navbar = ({ activeTab, setActiveTab }) => {
             })}
           </div>
 
+          {/* Install App Button */}
+          {showInstallBtn && (
+            <button
+              className="install-app-btn"
+              onClick={() => setIsInstallModalOpen(true)}
+              title="Install Crisis Respond India App"
+              aria-label="Install App"
+            >
+              <Download size={16} />
+              <span className="install-app-btn-label">Install App</span>
+            </button>
+          )}
+
           <button
             onClick={toggleTheme}
             className="theme-toggle-btn"
@@ -66,7 +99,28 @@ const Navbar = ({ activeTab, setActiveTab }) => {
             </button>
           );
         })}
+
+        {/* Mobile Install Button in bottom nav */}
+        {showInstallBtn && (
+          <button
+            className={`mobile-nav-btn mobile-install-nav-btn`}
+            onClick={() => setIsInstallModalOpen(true)}
+            aria-label="Install App"
+          >
+            <Download size={20} />
+            <span className="mobile-nav-label">Install</span>
+          </button>
+        )}
       </div>
+
+      {/* Install Instructions Modal */}
+      {isInstallModalOpen && (
+        <InstallModal
+          onClose={() => setIsInstallModalOpen(false)}
+          deferredPrompt={deferredPrompt}
+          onInstallClick={() => setIsInstallModalOpen(false)}
+        />
+      )}
     </>
   );
 };
