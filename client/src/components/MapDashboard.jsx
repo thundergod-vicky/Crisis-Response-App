@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { AlertCircle, Clock, Navigation, MapPin, Eye, Filter, Plus, ChevronRight, X } from 'lucide-react';
 import ReportForm from './ReportForm';
+import NavigationSimulator from './NavigationSimulator';
 
 // Helper to get triage colors
 const getTriageColor = (status) => {
@@ -33,6 +34,8 @@ const MapDashboard = () => {
   const [isReportDrawerOpen, setIsReportDrawerOpen] = useState(false);
   const [clickedCoords, setClickedCoords] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [userLocation, setUserLocation] = useState(null);
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -53,7 +56,59 @@ const MapDashboard = () => {
 
   useEffect(() => {
     fetchReports();
+
+    // Query user geolocation on mount
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.warn('Geolocation denied or unavailable. Falling back to simulated nearby responder starting point.', error);
+        },
+        { enableHighAccuracy: true, timeout: 8000 }
+      );
+    }
   }, []);
+
+  // Helper to calculate distance in km between two coords
+  const getDistanceKm = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Resolve starting location for simulation
+  const getSimulationStartLocation = () => {
+    if (!selectedReport) return null;
+    
+    // Check if we have userLocation and if it is within 100km of the incident
+    if (userLocation) {
+      const dist = getDistanceKm(
+        userLocation.lat, userLocation.lng, 
+        selectedReport.latitude, selectedReport.longitude
+      );
+      if (dist <= 100) {
+        return userLocation;
+      }
+    }
+    
+    // Fallback: Generate a mock emergency responder vehicle location near the incident (5-8 km away)
+    // to simulate a realistic highway dispatch route and prevent 1000+ km route lines
+    return {
+      lat: selectedReport.latitude - 0.04 - (Math.random() * 0.02),
+      lng: selectedReport.longitude - 0.04 - (Math.random() * 0.02)
+    };
+  };
 
   // Initialize Map
   useEffect(() => {
@@ -164,6 +219,7 @@ const MapDashboard = () => {
 
   const handleCloseDetail = () => {
     setSelectedReport(null);
+    setIsNavOpen(false);
   };
 
   const handleReportSuccess = () => {
@@ -195,6 +251,16 @@ const MapDashboard = () => {
           <Plus size={20} />
           <span>Report Highway Accident</span>
         </button>
+
+        {/* Navigation Simulator Panel overlay */}
+        {isNavOpen && selectedReport && (
+          <NavigationSimulator
+            incident={selectedReport}
+            userLocation={getSimulationStartLocation()}
+            mapInstance={mapInstanceRef.current}
+            onClose={() => setIsNavOpen(false)}
+          />
+        )}
       </div>
 
       {/* Right: Info Panel & List */}
@@ -290,13 +356,19 @@ const MapDashboard = () => {
             )}
             
             <div className="detail-actions">
+              <button 
+                onClick={() => setIsNavOpen(true)}
+                className="btn btn-primary-action btn-navigate-sim"
+              >
+                ⚡ Simulate Route
+              </button>
               <a 
                 href={`https://www.google.com/maps/search/?api=1&query=${selectedReport.latitude},${selectedReport.longitude}`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-secondary-action"
               >
-                Navigate to Site
+                Google Maps
               </a>
             </div>
           </div>

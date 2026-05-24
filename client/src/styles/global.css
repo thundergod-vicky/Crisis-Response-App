@@ -1942,3 +1942,371 @@ button, input, select, textarea {
 .facility-call-btn:hover {
   background-color: var(--border-color);
 }
+
+/* Navigation Simulator Styles */
+.nav-sim-panel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 500;
+  width: 340px;
+  max-height: calc(100% - 2rem);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(12px);
+}
+
+.nav-sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.nav-sim-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nav-sim-icon {
+  color: var(--accent);
+}
+
+.nav-sim-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nav-sim-subtitle {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.nav-sim-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-sim-close-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.nav-sim-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.nav-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: nav-spin 1s linear infinite;
+}
+
+@keyframes nav-spin {
+  to { transform: rotate(360deg); }
+}
+
+.nav-sim-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem;
+  padding: 0.75rem;
+  background-color: var(--danger-light);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.nav-sim-warn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background-color: var(--accent-light);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+}
+
+.nav-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  padding: 0.25rem;
+}
+
+.nav-stat svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.nav-stat-val {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.nav-stat-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.nav-progress-track {
+  height: 6px;
+  background-color: var(--border-color);
+  overflow: hidden;
+}
+
+.nav-progress-fill {
+  height: 100%;
+  background-color: var(--accent);
+  transition: width 0.1s linear;
+}
+
+.nav-speed-control {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-speed-control label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.nav-speed-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-speed-slider {
+  flex-grow: 1;
+  height: 4px;
+  background: var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.nav-speed-row span {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 60px;
+  text-align: right;
+}
+
+.nav-controls-row {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.nav-ctrl-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-ctrl-play {
+  background-color: var(--success);
+  color: white;
+}
+
+.nav-ctrl-play:hover {
+  background-color: var(--success-hover);
+}
+
+.nav-ctrl-pause {
+  background-color: var(--accent);
+  color: white;
+}
+
+.nav-ctrl-pause:hover {
+  background-color: var(--accent-hover);
+}
+
+.nav-ctrl-stop {
+  background-color: var(--text-muted);
+  color: white;
+}
+
+.nav-ctrl-stop:hover {
+  background-color: var(--text-secondary);
+}
+
+.nav-arrived-banner {
+  padding: 0.75rem;
+  margin: 0.75rem;
+  background-color: var(--success-light);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-md);
+  color: var(--success);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  animation: pulse-arrived 1.5s infinite;
+}
+
+@keyframes pulse-arrived {
+  0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+.nav-steps-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  max-height: 250px;
+}
+
+.nav-steps-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+}
+
+.nav-step-item.active {
+  background-color: var(--accent-light);
+  border-left-color: var(--accent);
+}
+
+.nav-step-item.done {
+  opacity: 0.5;
+}
+
+.nav-step-icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.nav-step-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.nav-step-instr {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.nav-step-dist {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.nav-step-arrow {
+  color: var(--accent);
+  align-self: center;
+}
+
+/* Navigate Sim Button customization in incident detail drawer */
+.btn-navigate-sim {
+  background-color: var(--accent);
+  color: white !important;
+  border: none;
+  font-weight: 700;
+}
+
+.btn-navigate-sim:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Mobile responsive styling for the Navigation Simulator */
+@media (max-width: 768px) {
+  .nav-sim-panel {
+    top: auto;
+    bottom: 5.5rem; /* Clear bottom navigation bar */
+    left: 0.75rem;
+    right: 0.75rem;
+    width: calc(100% - 1.5rem);
+    max-height: 45vh;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .nav-steps-list {
+    max-height: 150px;
+  }
+}
