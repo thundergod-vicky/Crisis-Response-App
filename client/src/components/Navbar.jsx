@@ -16,7 +16,7 @@ const Navbar = ({ activeTab, setActiveTab }) => {
     <>
       <nav className="navbar">
         <div className="nav-brand">
-          <AlertTriangle className="nav-logo-icon" size={24} fill="currentColor" />
+          <img src="/logo.png" alt="Crisis Respond India Logo" className="nav-logo-img" />
           <div className="nav-title-group">
             <span className="nav-title">Crisis Respond India</span>
             <span className="nav-subtitle">Highway Emergency Net</span>

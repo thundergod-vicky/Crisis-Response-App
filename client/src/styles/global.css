@@ -94,6 +94,21 @@ button, input, select, textarea {
   animation: pulse-ring 2s infinite;
 }
 
+.nav-logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 12px rgba(217, 119, 6, 0.45);
+  border: 1.5px solid var(--border-color);
+  background-color: var(--bg-primary);
+  transition: transform var(--transition-fast);
+}
+
+.nav-logo-img:hover {
+  transform: scale(1.1);
+}
+
 .nav-title-group {
   display: flex;
   flex-direction: column;
