@@ -341,6 +341,16 @@ const MapDashboard = () => {
             <h3 className="detail-title">NH Highway Incident</h3>
             <p className="detail-reporter">Reported by: <strong>{selectedReport.reporter_name}</strong></p>
 
+            {selectedReport.image_url && (
+              <div className="detail-image-container">
+                <img 
+                  src={getReportImageSrc(selectedReport.image_url)} 
+                  alt="Accident scene report" 
+                  className="detail-image"
+                />
+              </div>
+            )}
+
             <div className="detail-stats-grid">
               <div className="stat-card" style={{ borderColor: 'var(--triage-black)' }}>
                 <span className="stat-num">{selectedReport.deceased_count}</span>
@@ -376,16 +386,6 @@ const MapDashboard = () => {
             </div>
 
             <p className="detail-description">{selectedReport.description}</p>
-
-            {selectedReport.image_url && (
-              <div className="detail-image-container">
-                <img 
-                  src={getReportImageSrc(selectedReport.image_url)} 
-                  alt="Accident scene report" 
-                  className="detail-image"
-                />
-              </div>
-            )}
             
             <div className="detail-actions">
               <button 
