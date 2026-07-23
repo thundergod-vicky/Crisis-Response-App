@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Image, Video, MapPin, Send, MessageSquare, Heart, Clock, Navigation } from 'lucide-react';
+import { supabase } from '../supabase';
+
+const getMediaSrc = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  return `http://localhost:5001${url}`;
+};
 
 const CrashFeed = () => {
   const [feedItems, setFeedItems] = useState([]);
@@ -15,9 +24,16 @@ const CrashFeed = () => {
   const fetchFeed = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('http://localhost:5001/api/crash-feed');
-      const data = await res.json();
-      setFeedItems(data);
+      const { data, error } = await supabase
+        .from('crash_feed')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching crash feed from Supabase:', error.message);
+      } else {
+        setFeedItems(data || []);
+      }
     } catch (err) {
       console.error('Error loading feed:', err);
     } finally {
@@ -27,6 +43,21 @@ const CrashFeed = () => {
 
   useEffect(() => {
     fetchFeed();
+
+    // Subscribe to real-time additions on crash_feed table
+    const feedChannel = supabase
+      .channel('public:crash_feed')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'crash_feed' },
+        (payload) => {
+          if (payload?.new) {
+            setFeedItems((prev) => [payload.new, ...prev.filter((i) => i.id !== payload.new.id)]);
+          }
+        }
+      )
+      .subscribe();
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -35,6 +66,10 @@ const CrashFeed = () => {
         (err) => console.log('Location access denied for feed geotagging.')
       );
     }
+
+    return () => {
+      supabase.removeChannel(feedChannel);
+    };
   }, []);
 
   const handleMediaChange = (e) => {
@@ -54,26 +89,44 @@ const CrashFeed = () => {
     if (!userName.trim() || !description.trim()) return;
 
     setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append('user_name', userName);
-    formData.append('description', description);
-    
-    if (attachGPS && coords) {
-      formData.append('latitude', coords.lat);
-      formData.append('longitude', coords.lng);
-    }
-
-    if (mediaFile) {
-      formData.append('media', mediaFile);
-    }
+    let mediaUrl = null;
+    let mediaType = 'none';
 
     try {
-      const res = await fetch('http://localhost:5001/api/crash-feed', {
-        method: 'POST',
-        body: formData
-      });
+      if (mediaFile) {
+        const fileExt = mediaFile.name.split('.').pop().toLowerCase();
+        if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExt)) {
+          mediaType = 'video';
+        } else {
+          mediaType = 'image';
+        }
 
-      if (!res.ok) throw new Error('Failed to post update');
+        const filePath = `feed/${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('crisis-media')
+          .upload(filePath, mediaFile);
+
+        if (uploadError) {
+          console.warn('Storage upload notice:', uploadError.message);
+        } else if (uploadData) {
+          const { data: urlData } = supabase.storage.from('crisis-media').getPublicUrl(uploadData.path);
+          mediaUrl = urlData?.publicUrl || null;
+        }
+      }
+
+      const postPayload = {
+        user_name: userName,
+        description: description,
+        media_url: mediaUrl,
+        media_type: mediaType,
+        latitude: attachGPS && coords ? coords.lat : null,
+        longitude: attachGPS && coords ? coords.lng : null,
+        timestamp: new Date().toISOString()
+      };
+
+      const { error: dbError } = await supabase.from('crash_feed').insert([postPayload]);
+
+      if (dbError) throw new Error(dbError.message);
 
       // Reset form
       setDescription('');
@@ -209,14 +262,14 @@ const CrashFeed = () => {
                 <div className="feed-media-container">
                   {item.media_type === 'video' ? (
                     <video 
-                      src={`http://localhost:5001${item.media_url}`} 
+                      src={getMediaSrc(item.media_url)} 
                       className="feed-media" 
                       controls 
                       muted 
                     />
                   ) : (
                     <img 
-                      src={`http://localhost:5001${item.media_url}`} 
+                      src={getMediaSrc(item.media_url)} 
                       alt="Crash social media upload" 
                       className="feed-media" 
                     />

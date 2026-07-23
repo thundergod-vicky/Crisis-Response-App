@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.8",
     "leaflet": "^1.9.4",
-    "lucide-react": "^0.359.0"
+    "lucide-react": "^0.359.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

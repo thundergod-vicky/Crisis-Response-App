@@ -4,6 +4,15 @@ import 'leaflet/dist/leaflet.css';
 import { AlertCircle, Clock, Navigation, MapPin, Eye, Filter, Plus, ChevronRight, X } from 'lucide-react';
 import ReportForm from './ReportForm';
 import NavigationSimulator from './NavigationSimulator';
+import { supabase } from '../supabase';
+
+const getReportImageSrc = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  return `http://localhost:5001${url}`;
+};
 
 // Helper to get triage colors
 const getTriageColor = (status) => {
@@ -44,9 +53,16 @@ const MapDashboard = () => {
   const fetchReports = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('http://localhost:5001/api/reports');
-      const data = await res.json();
-      setReports(data);
+      const { data, error } = await supabase
+        .from('reports')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching reports from Supabase:', error.message);
+      } else {
+        setReports(data || []);
+      }
     } catch (err) {
       console.error('Error fetching reports:', err);
     } finally {
@@ -56,6 +72,18 @@ const MapDashboard = () => {
 
   useEffect(() => {
     fetchReports();
+
+    // Subscribe to realtime changes on reports table
+    const reportsChannel = supabase
+      .channel('public:reports')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reports' },
+        () => {
+          fetchReports();
+        }
+      )
+      .subscribe();
 
     // Query user geolocation on mount
     if (navigator.geolocation) {
@@ -72,6 +100,10 @@ const MapDashboard = () => {
         { enableHighAccuracy: true, timeout: 8000 }
       );
     }
+
+    return () => {
+      supabase.removeChannel(reportsChannel);
+    };
   }, []);
 
   // Helper to calculate distance in km between two coords
@@ -348,7 +380,7 @@ const MapDashboard = () => {
             {selectedReport.image_url && (
               <div className="detail-image-container">
                 <img 
-                  src={`http://localhost:5001${selectedReport.image_url}`} 
+                  src={getReportImageSrc(selectedReport.image_url)} 
                   alt="Accident scene report" 
                   className="detail-image"
                 />

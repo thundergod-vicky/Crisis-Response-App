@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Navigation, Camera, Upload, AlertCircle, RefreshCw } from 'lucide-react';
+import { supabase } from '../supabase';
 
 const ReportForm = ({ prefilledCoords, onSuccess, onCancel }) => {
   const [latitude, setLatitude] = useState('');
@@ -78,30 +79,42 @@ const ReportForm = ({ prefilledCoords, onSuccess, onCancel }) => {
     setIsSubmitting(true);
     setErrorMsg('');
 
-    const formData = new FormData();
-    formData.append('latitude', latitude);
-    formData.append('longitude', longitude);
-    formData.append('road_status', roadStatus);
-    formData.append('intensity', intensity);
-    formData.append('deceased_count', deceasedCount);
-    formData.append('immediate_count', immediateCount);
-    formData.append('delayed_count', delayedCount);
-    formData.append('minimal_count', minimalCount);
-    formData.append('description', description);
-    formData.append('reporter_name', reporterName);
-    
-    if (mediaFile) {
-      formData.append('media', mediaFile);
-    }
-
     try {
-      const res = await fetch('http://localhost:5001/api/reports', {
-        method: 'POST',
-        body: formData
-      });
+      let imageUrl = null;
+      if (mediaFile) {
+        const fileExt = mediaFile.name.split('.').pop();
+        const filePath = `reports/${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('crisis-media')
+          .upload(filePath, mediaFile);
 
-      if (!res.ok) {
-        throw new Error('Failed to submit incident report');
+        if (uploadError) {
+          console.warn('Storage upload error (verify crisis-media public bucket exists):', uploadError.message);
+        } else if (uploadData) {
+          const { data: urlData } = supabase.storage.from('crisis-media').getPublicUrl(uploadData.path);
+          imageUrl = urlData?.publicUrl || null;
+        }
+      }
+
+      const { error: dbError } = await supabase.from('reports').insert([
+        {
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          timestamp: new Date().toISOString(),
+          image_url: imageUrl,
+          road_status: roadStatus,
+          intensity: intensity,
+          deceased_count: parseInt(deceasedCount || 0, 10),
+          immediate_count: parseInt(immediateCount || 0, 10),
+          delayed_count: parseInt(delayedCount || 0, 10),
+          minimal_count: parseInt(minimalCount || 0, 10),
+          description: description || '',
+          reporter_name: reporterName || 'Anonymous bystander'
+        }
+      ]);
+
+      if (dbError) {
+        throw new Error(dbError.message);
       }
 
       onSuccess();

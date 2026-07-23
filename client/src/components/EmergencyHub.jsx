@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, Shield, ShieldAlert, Heart, Truck, MapPin, Search, RefreshCw } from 'lucide-react';
+import { supabase } from '../supabase';
+
+function getDistanceInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 const EmergencyHub = () => {
   const [coords, setCoords] = useState(null);
@@ -21,10 +36,48 @@ const EmergencyHub = () => {
     try {
       setIsLoadingHelp(true);
       setErrorMsg('');
-      const res = await fetch(`http://localhost:5001/api/nearby-help?lat=${lat}&lng=${lng}`);
-      if (!res.ok) throw new Error('Could not retrieve nearby emergency facilities.');
-      const data = await res.json();
-      setNearbyServices(data);
+
+      const { data: rows, error } = await supabase.from('emergency_facilities').select('*');
+
+      if (error) {
+        console.warn('Notice querying emergency_facilities from Supabase:', error.message);
+      }
+
+      let facilities = rows || [];
+
+      let facilitiesWithDistance = facilities.map(f => ({
+        ...f,
+        distance: parseFloat(getDistanceInKm(lat, lng, f.latitude, f.longitude).toFixed(2))
+      }));
+
+      facilitiesWithDistance.sort((a, b) => a.distance - b.distance);
+
+      if (facilitiesWithDistance.length === 0 || facilitiesWithDistance[0].distance > 100) {
+        const generated = [
+          { id: 101, name: 'Regional Trauma Care Unit', type: 'hospital', latitude: lat + 0.012, longitude: lng - 0.014, address: 'National Highway Bypass Sector', phone: '+91-9800112233' },
+          { id: 102, name: 'Sub-Divisional Civil Clinic', type: 'hospital', latitude: lat - 0.021, longitude: lng + 0.018, address: 'Central Highway Station', phone: '+91-9800112244' },
+          { id: 103, name: 'Highway Police Patrol Post', type: 'police', latitude: lat + 0.008, longitude: lng + 0.009, address: 'NH Toll Gate Sector', phone: '+91-9800112255' },
+          { id: 104, name: 'Sadar Police Depot', type: 'police', latitude: lat - 0.015, longitude: lng - 0.017, address: 'Police Line Sector', phone: '+91-9800112266' },
+          { id: 105, name: 'NHAI Heavy Tow & Recovery Depot', type: 'crane', latitude: lat + 0.023, longitude: lng - 0.008, address: 'NH Highway Crossing', phone: '+91-9800112277' },
+          { id: 106, name: 'Regional Towing Services', type: 'crane', latitude: lat - 0.009, longitude: lng + 0.028, address: 'Industrial Sector 3', phone: '+91-9800112288' }
+        ].map(f => ({
+          ...f,
+          distance: parseFloat(getDistanceInKm(lat, lng, f.latitude, f.longitude).toFixed(2))
+        }));
+        generated.sort((a, b) => a.distance - b.distance);
+
+        setNearbyServices({
+          hospitals: generated.filter(f => f.type === 'hospital').slice(0, 4),
+          police: generated.filter(f => f.type === 'police').slice(0, 4),
+          cranes: generated.filter(f => f.type === 'crane').slice(0, 4)
+        });
+      } else {
+        setNearbyServices({
+          hospitals: facilitiesWithDistance.filter(f => f.type === 'hospital' && f.distance <= 100).slice(0, 4),
+          police: facilitiesWithDistance.filter(f => f.type === 'police' && f.distance <= 100).slice(0, 4),
+          cranes: facilitiesWithDistance.filter(f => f.type === 'crane' && f.distance <= 100).slice(0, 4)
+        });
+      }
     } catch (err) {
       console.error(err);
       setErrorMsg('Failed to query nearby help database.');

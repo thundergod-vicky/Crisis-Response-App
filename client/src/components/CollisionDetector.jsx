@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Activity, ShieldAlert, Heart, Radio, MapPin, BellOff, HelpCircle } from 'lucide-react';
+import { supabase } from '../supabase';
 
 const CollisionDetector = () => {
   const [gForce, setGForce] = useState(1.0);
@@ -140,25 +141,25 @@ const CollisionDetector = () => {
     const defaultLat = gpsCoords?.lat || 28.5355;
     const defaultLng = gpsCoords?.lng || 77.2090;
 
-    const reportData = {
-      latitude: defaultLat,
-      longitude: defaultLng,
-      road_status: 'PARTIAL_BLOCKAGE',
-      intensity: 'SEVERE',
-      deceased_count: 0,
-      immediate_count: 1, // Represents the vehicle owner
-      delayed_count: 0,
-      minimal_count: 0,
-      description: `AUTOMATIC COLLISION ALERT: High G-Force event (${gForce} Gs) detected by smartphone sensors. Safety confirmation timer expired without response. Instant dispatch requested.`,
-      reporter_name: 'Telemetry Automatic Dispatch'
-    };
-
     try {
-      await fetch('http://localhost:5001/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reportData)
-      });
+      const { error } = await supabase.from('reports').insert([
+        {
+          latitude: defaultLat,
+          longitude: defaultLng,
+          timestamp: new Date().toISOString(),
+          road_status: 'PARTIAL_BLOCKAGE',
+          intensity: 'SEVERE',
+          deceased_count: 0,
+          immediate_count: 1, // Represents the vehicle owner
+          delayed_count: 0,
+          minimal_count: 0,
+          description: `AUTOMATIC COLLISION ALERT: High G-Force event (${gForce} Gs) detected by smartphone sensors. Safety confirmation timer expired without response. Instant dispatch requested.`,
+          reporter_name: 'Telemetry Automatic Dispatch'
+        }
+      ]);
+      if (error) {
+        console.error('Error auto-dispatching collision to Supabase:', error.message);
+      }
     } catch (err) {
       console.error('Error auto-dispatching collision:', err);
     }
