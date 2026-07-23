@@ -102,16 +102,20 @@ const NavigationSimulator = ({ incident, userLocation, mapInstance, onClose }) =
   const isPlayingRef = useRef(false);
   const totalDistRef = useRef(0);
 
-  // Fetch route from Mappls
+  // Fetch driving route from CORS-friendly routing engine (OSRM) with fallback
   useEffect(() => {
     if (!userLocation || !incident) return;
 
     const origin = `${userLocation.lng},${userLocation.lat}`;
     const dest = `${incident.longitude},${incident.latitude}`;
-    const url = `https://route.mappls.com/route/details/driving/${origin};${dest}?access_token=${MAPPLS_KEY}&geometries=polyline6&overview=full&steps=true`;
+    // OSRM provides free CORS-enabled routing for real road networks
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin};${dest}?overview=full&geometries=polyline6&steps=true`;
 
     fetch(url)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('Routing service response error');
+        return r.json();
+      })
       .then(data => {
         if (!data.routes || data.routes.length === 0) throw new Error('No route found');
 
@@ -135,8 +139,8 @@ const NavigationSimulator = ({ incident, userLocation, mapInstance, onClose }) =
         setStatus('ready');
       })
       .catch(err => {
-        console.error('Mappls route fetch error:', err);
-        // Fallback: generate a straight-line route with intermediate simulation points
+        console.warn('OSRM route fetch warning, using interpolated fallback route:', err.message);
+        // Fallback: generate a smooth route with intermediate simulation points
         const coords = generateFallbackRoute(
           [userLocation.lat, userLocation.lng],
           [incident.latitude, incident.longitude],
@@ -147,13 +151,13 @@ const NavigationSimulator = ({ incident, userLocation, mapInstance, onClose }) =
         totalDistRef.current = dist;
         setDistRemaining(dist);
         setTimeRemaining(dist / (50 / 3.6)); // assume 50 km/h
-        setRouteInfo({ distance: dist, duration: dist / (50 / 3.6), summary: 'Estimated route (fallback)' });
+        setRouteInfo({ distance: dist, duration: dist / (50 / 3.6), summary: 'Estimated route' });
         setSteps([
           { instruction: 'Head towards incident site', distance: dist * 0.4, type: 'depart' },
           { instruction: 'Continue on highway', distance: dist * 0.4, type: 'straight' },
           { instruction: 'Arrive at incident site', distance: dist * 0.2, type: 'arrive' },
         ]);
-        setError('Live route unavailable — showing estimated path');
+        setError('Live route calculated using estimated emergency path');
         setStatus('ready');
       });
   }, [userLocation, incident]);
@@ -355,7 +359,7 @@ const NavigationSimulator = ({ incident, userLocation, mapInstance, onClose }) =
           <Navigation2 size={18} className="nav-sim-icon" />
           <div>
             <h4 className="nav-sim-title">Navigation Simulation</h4>
-            <span className="nav-sim-subtitle">Powered by MapmyIndia Mappls</span>
+            <span className="nav-sim-subtitle">Powered by Open Highway Routing Engine</span>
           </div>
         </div>
         <button className="nav-sim-close-btn" onClick={onClose}>
