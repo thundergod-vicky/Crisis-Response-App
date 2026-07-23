@@ -44,7 +44,7 @@ const InstallModal = ({ onClose, deferredPrompt, onInstallClick }) => {
     {
       icon: '✅',
       title: 'Launch from Home',
-      desc: 'The Crisis Respond India app icon will appear on your home screen. Open it like any native app!',
+      desc: 'The Mahamarg app icon will appear on your home screen. Open it like any native app!',
     },
   ];
 
@@ -100,8 +100,8 @@ const InstallModal = ({ onClose, deferredPrompt, onInstallClick }) => {
           <div className="install-modal-brand">
             <img src="/logo.png" alt="App Logo" className="install-modal-logo" />
             <div>
-              <h2 className="install-modal-title">Install Crisis Respond India</h2>
-              <p className="install-modal-tagline">Add to your home screen for offline access & instant emergency dispatch</p>
+              <h2 className="install-modal-title">Install Mahamarg</h2>
+              <p className="install-modal-tagline">india's own crisis response app</p>
             </div>
           </div>
           <button className="install-modal-close" onClick={onClose} aria-label="Close">

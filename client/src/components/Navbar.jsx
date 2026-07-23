@@ -36,10 +36,10 @@ const Navbar = ({ activeTab, setActiveTab }) => {
     <>
       <nav className="navbar">
         <div className="nav-brand">
-          <img src="/logo.png" alt="Crisis Respond India Logo" className="nav-logo-img" />
+          <img src="/logo.png" alt="Mahamarg Logo" className="nav-logo-img" />
           <div className="nav-title-group">
-            <span className="nav-title">Crisis Respond India</span>
-            <span className="nav-subtitle">Highway Emergency Net</span>
+            <span className="nav-title">Mahamarg</span>
+            <span className="nav-subtitle">india's own crisis response app</span>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ const Navbar = ({ activeTab, setActiveTab }) => {
             <button
               className="install-app-btn"
               onClick={() => setIsInstallModalOpen(true)}
-              title="Install Crisis Respond India App"
+              title="Install Mahamarg App"
               aria-label="Install App"
             >
               <Download size={16} />

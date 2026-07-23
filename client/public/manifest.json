@@ -1,7 +1,7 @@
 {
-  "short_name": "CrisisRespond",
-  "name": "Crisis Respond India - Highway Emergency Net",
-  "description": "Real-time emergency dispatch and navigation support net for Indian highways.",
+  "short_name": "Mahamarg",
+  "name": "Mahamarg - India's Own Crisis Response App",
+  "description": "Mahamarg: India's own crisis response app for real-time emergency dispatch and navigation support.",
   "icons": [
     {
       "src": "logo.png",
