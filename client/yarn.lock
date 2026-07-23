@@ -784,10 +784,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucide-react@^0.359.0:
-  version "0.359.0"
-  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-0.359.0.tgz"
-  integrity sha512-bxVL+rM/wacjpT0BKShA6r5IIKb6LCRg+ltFG9pnnIwaRX8kK3hq8v5JwMpT7RC6XeqB5cSaaV6GapPWWmtliw==
+lucide-react@^1.26.0:
+  version "1.26.0"
+  resolved "https://registry.npmjs.org/lucide-react/-/lucide-react-1.26.0.tgz"
+  integrity sha512-raglYVR2+VkMfJL158krjVmE+rV5ST2lzA/KQm1FRSjMHT4MnWaegHxoVEpmc2So3nOEhp9oGejJwAPX8MoAjg==
 
 minimatch@^10.2.4:
   version "10.2.5"
