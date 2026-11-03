@@ -10,8 +10,8 @@ yarn-error.log*
 .env.production.local
 
 # SQLite Database
-*.sqlite
-*.sqlite-journal
+# *.sqlite
+# *.sqlite-journal
 
 # Uploaded Assets
 server/uploads/*
